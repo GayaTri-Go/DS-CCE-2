@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Student Marks Analysis System — DS CCE-II</title>
+<style>
+:root{--bg:#f5f6fb;--card:#fff;--ink:#202437;--muted:#697087;--accent:#5b4bdb;--line:#e1e4ef;--green:#16794b;--red:#bd3434}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:1000px;margin:auto;padding:24px}header{margin-bottom:20px}h1{margin:0;font-size:clamp(1.5rem,4vw,2.2rem)}h2{margin-top:0}.sub,.muted{color:var(--muted)}
+nav{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}button{border:1px solid var(--line);background:white;color:var(--ink);padding:10px 14px;border-radius:10px;font:inherit;font-weight:650;cursor:pointer}
+button.active,.primary{background:var(--accent);color:white;border-color:var(--accent)}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px}label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:4px}
+input{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;font:inherit;background:white;color:var(--ink)}.full{width:100%;margin-top:12px}.hidden{display:none!important}
+.table-wrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:560px}th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);white-space:nowrap}th{font-size:.8rem;color:var(--muted)}
+.pass{color:var(--green);font-weight:700}.fail{color:var(--red);font-weight:700}.notice{margin-top:10px;min-height:1.3em}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}.stat{padding:14px;border:1px solid var(--line);border-radius:12px}.stat strong{display:block;font-size:1.4rem}
+pre{white-space:pre;overflow:auto;background:#171827;color:#f4f3ff;padding:16px;border-radius:12px;font:12px/1.6 ui-monospace,monospace;max-height:480px}
+@media(max-width:600px){main{padding:14px}.card{padding:14px}}
+</style>
+</head>
+<body><main>
+<header><h1>Student Marks Analysis System</h1><p class="sub">Data Structures CCE-II · Parallel Arrays · Linear Search · C++ companion program</p></header>
+<nav>
+<button class="active" data-tab="students">Students</button><button data-tab="search">Linear Search</button>
+<button data-tab="analysis">Class Analysis</button><button data-tab="cpp">C++ Logic</button>
+</nav>
+<section id="students">
+<div class="card"><h2>Add student</h2><div class="grid">
+<div><label for="roll">Roll number</label><input id="roll" type="number" min="1"></div>
+<div><label for="name">Student name</label><input id="name" maxlength="50"></div>
+<div><label for="maths">Maths / 100</label><input id="maths" type="number" min="0" max="100"></div>
+<div><label for="ds">Data Structures / 100</label><input id="ds" type="number" min="0" max="100"></div>
+<div><label for="deld">DELD / 100</label><input id="deld" type="number" min="0" max="100"></div>
+</div><button class="primary full" id="add">Add student</button><p class="notice muted" id="message" aria-live="polite"></p></div>
+<div class="card"><h2>Student records</h2><div class="table-wrap"><table id="records"></table></div><p class="muted">Pass rule: at least 40 marks in every subject. Maximum capacity: 50 students.</p></div>
+</section>
+<section id="search" class="hidden"><div class="card"><h2>Search by roll number</h2>
+<div class="grid"><div><label for="searchRoll">Roll number</label><input id="searchRoll" type="number"></div></div>
+<button class="primary" id="find">Run linear search</button><div id="searchResult" class="notice"></div><div class="table-wrap"><table id="trace"></table></div></div></section>
+<section id="analysis" class="hidden"><div class="card"><h2>Class analysis</h2><div id="stats" class="stats"></div><div class="table-wrap"><table id="subjectStats"></table></div></div></section>
+<section id="cpp" class="hidden"><div class="card"><h2>Matching C++ implementation</h2>
+<p class="muted">The C++ program uses the same 50-student capacity, subjects, sample records, linear search, totals and pass rule. Compile with <code>g++ -std=c++17 main.cpp -o marks</code>.</p>
+<button class="primary" id="copy">Copy C++ code</button> <a href="main.cpp" download><button>Download main.cpp</button></a><pre id="cppSource"></pre></div></section>
+<script>
+const MAX=50,PASS=40,SUBJECTS=["Maths","DS","DELD"];
+const students=[
+{roll:101,name:"Aarav",marks:[78,85,72]},
+{roll:102,name:"Isha",marks:[92,88,95]},
+{roll:103,name:"Rohan",marks:[35,48,52]},
+{roll:104,name:"Meera",marks:[66,59,71]},
+{roll:105,name:"Kabir",marks:[45,38,60]}
+];
+const $=id=>document.getElementById(id),total=s=>s.marks.reduce((a,b)=>a+b,0),passed=s=>s.marks.every(m=>m>=PASS);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function linearSearch(roll){let comparisons=0;for(let i=0;i<students.length;i++){comparisons++;if(students[i].roll===roll)return{index:i,comparisons};}return{index:-1,comparisons};}
+function renderRecords(){
+ let h="<tr><th>Roll</th><th>Name</th>"+SUBJECTS.map(s=>"<th>"+s+"</th>").join("")+"<th>Total / 300</th><th>Result</th></tr>";
+ students.forEach(s=>h+=`<tr><td>${s.roll}</td><td>${esc(s.name)}</td>${s.marks.map(m=>"<td>"+m+"</td>").join("")}<td>${total(s)}</td><td class="${passed(s)?"pass":"fail"}">${passed(s)?"PASS":"FAIL"}</td></tr>`);
+ $("records").innerHTML=h;renderAnalysis();
+}
+function renderAnalysis(){
+ if(!students.length){$("stats").textContent="No student records yet.";return;}
+ const sums=[0,0,0];students.forEach(s=>s.marks.forEach((m,i)=>sums[i]+=m));
+ const high=students.reduce((a,b)=>total(a)>=total(b)?a:b),low=students.reduce((a,b)=>total(a)<=total(b)?a:b);
+ const passCount=students.filter(passed).length,average=students.reduce((a,s)=>a+total(s),0)/(students.length*3);
+ $("stats").innerHTML=`<div class="stat"><span class="muted">Students</span><strong>${students.length}</strong></div><div class="stat"><span class="muted">Average / subject</span><strong>${average.toFixed(2)}</strong></div><div class="stat"><span class="muted">Pass percentage</span><strong>${(passCount*100/students.length).toFixed(2)}%</strong></div><div class="stat"><span class="muted">Passed / Failed</span><strong>${passCount} / ${students.length-passCount}</strong></div><div class="stat"><span class="muted">Highest total</span><strong>${total(high)}</strong>${esc(high.name)}</div><div class="stat"><span class="muted">Lowest total</span><strong>${total(low)}</strong>${esc(low.name)}</div>`;
+ $("subjectStats").innerHTML="<tr><th>Subject</th><th>Average</th></tr>"+SUBJECTS.map((s,i)=>`<tr><td>${s}</td><td>${(sums[i]/students.length).toFixed(2)}</td></tr>`).join("");
+}
+$("add").onclick=()=>{
+ const rawRoll=$("roll").value,name=$("name").value.trim(),rawMarks=[$("maths").value,$("ds").value,$("deld").value],marks=rawMarks.map(Number),roll=Number(rawRoll);let error="";
+ if(!rawRoll||!Number.isInteger(roll)||roll<=0)error="Enter a positive whole-number roll number.";
+ else if(!name)error="Enter the student's name.";
+ else if(rawMarks.some(v=>v==="")||marks.some(m=>!Number.isInteger(m)||m<0||m>100))error="Enter whole-number marks from 0 to 100 for every subject.";
+ else if(students.length>=MAX)error="Array is full (50 students maximum).";
+ else if(linearSearch(roll).index!==-1)error="That roll number already exists.";
+ if(error){$("message").textContent=error;$("message").className="notice fail";return;}
+ students.push({roll,name,marks});$("message").textContent="Student added successfully.";$("message").className="notice pass";
+ ["roll","name","maths","ds","deld"].forEach(id=>$(id).value="");renderRecords();
+};
+$("find").onclick=()=>{
+ const raw=$("searchRoll").value,roll=Number(raw);
+ if(raw===""||!Number.isInteger(roll)){$("searchResult").textContent="Enter a valid roll number.";return;}
+ const result=linearSearch(roll),s=result.index<0?null:students[result.index];
+ $("searchResult").innerHTML=s?`<h3>${esc(s.name)} · Roll ${s.roll}</h3><p>${SUBJECTS.map((x,i)=>x+": "+s.marks[i]).join(" · ")}</p><p>Total: <b>${total(s)}/300</b> · ${(total(s)/3).toFixed(2)}% · <b class="${passed(s)?"pass":"fail"}">${passed(s)?"PASS":"FAIL"}</b></p><p class="muted">Found at index ${result.index} after ${result.comparisons} comparison(s).</p>`:`<p class="fail">Student not found after ${result.comparisons} comparison(s).</p>`;
+ let h="<tr><th>Index</th><th>Roll</th><th>Comparison</th></tr>";
+ students.forEach((x,i)=>h+=`<tr><td>${i}</td><td>${x.roll}</td><td>${i===result.index?"Match — stop":result.index<0||i<result.index?"No match":"Not reached"}</td></tr>`);$("trace").innerHTML=h;
+};
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
+ document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x===b));
+ ["students","search","analysis","cpp"].forEach(id=>$(id).classList.toggle("hidden",id!==b.dataset.tab));
+});
+const cpp=`#include <iostream>
+#include <iomanip>
+#include <string>
+using namespace std;
+
+const int MAX_STUDENTS = 50;
+const int SUBJECTS = 3;
+const int PASS_MARKS = 40;
+const string SUBJECT_NAME[SUBJECTS] = {"Maths", "DS", "DELD"};
+
+int rollNo[MAX_STUDENTS];
+string studentName[MAX_STUDENTS];
+int marks[MAX_STUDENTS][SUBJECTS];
+int totalMarks[MAX_STUDENTS];
+int countStudents = 0;
+
+int linearSearch(int key) {
+    for (int i = 0; i < countStudents; i++)
+        if (rollNo[i] == key) return i;
+    return -1;
+}
+bool isPass(int i) {
+    for (int s = 0; s < SUBJECTS; s++)
+        if (marks[i][s] < PASS_MARKS) return false;
+    return true;
+}
+bool addStudent(int roll, const string& name, int m1, int m2, int m3) {
+    if (countStudents == MAX_STUDENTS || roll <= 0 || linearSearch(roll) != -1) return false;
+    if (m1 < 0 || m1 > 100 || m2 < 0 || m2 > 100 || m3 < 0 || m3 > 100) return false;
+    rollNo[countStudents] = roll;
+    studentName[countStudents] = name;
+    marks[countStudents][0] = m1;
+    marks[countStudents][1] = m2;
+    marks[countStudents][2] = m3;
+    totalMarks[countStudents] = m1 + m2 + m3;
+    countStudents++;
+    return true;
+}
+void displayAll() {
+    if (!countStudents) { cout << "No records to display.\\\\n"; return; }
+    cout << left << setw(8) << "Roll" << setw(18) << "Name";
+    for (int s = 0; s < SUBJECTS; s++) cout << setw(8) << SUBJECT_NAME[s];
+    cout << setw(10) << "Total" << "Result\\\\n";
+    for (int i = 0; i < countStudents; i++) {
+        cout << left << setw(8) << rollNo[i] << setw(18) << studentName[i];
+        for (int s = 0; s < SUBJECTS; s++) cout << setw(8) << marks[i][s];
+        cout << setw(10) << totalMarks[i] << (isPass(i) ? "PASS" : "FAIL") << '\\\\n';
+    }
+}
+void searchStudent() {
+    int key;
+    cout << "Enter roll number: ";
+    if (!(cin >> key)) return;
+    int i = linearSearch(key);
+    if (i == -1) { cout << "Student not found.\\\\n"; return; }
+    cout << "Name: " << studentName[i] << "\\\\nRoll: " << rollNo[i] << '\\\\n';
+    for (int s = 0; s < SUBJECTS; s++)
+        cout << SUBJECT_NAME[s] << ": " << marks[i][s] << '\\\\n';
+    cout << "Total: " << totalMarks[i] << "/300 (" << fixed << setprecision(2)
+         << totalMarks[i] / 3.0 << "%)\\\\nResult: " << (isPass(i) ? "PASS" : "FAIL") << '\\\\n';
+}
+void analyzeMarks() {
+    if (!countStudents) { cout << "No records to analyze.\\\\n"; return; }
+    int high = 0, low = 0, passedCount = 0, sum = 0, subjectSum[SUBJECTS] = {};
+    for (int i = 0; i < countStudents; i++) {
+        sum += totalMarks[i];
+        if (totalMarks[i] > totalMarks[high]) high = i;
+        if (totalMarks[i] < totalMarks[low]) low = i;
+        if (isPass(i)) passedCount++;
+        for (int s = 0; s < SUBJECTS; s++) subjectSum[s] += marks[i][s];
+    }
+    cout << fixed << setprecision(2);
+    cout << "Students: " << countStudents << "\\\\nAverage per subject: "
+         << sum / double(countStudents * SUBJECTS) << '\\\\n';
+    cout << "Highest: " << studentName[high] << " (" << totalMarks[high] << ")\\\\n";
+    cout << "Lowest: " << studentName[low] << " (" << totalMarks[low] << ")\\\\n";
+    cout << "Passed: " << passedCount << ", Failed: " << countStudents-passedCount << '\\\\n';
+    cout << "Pass percentage: " << passedCount*100.0/countStudents << "%\\\\n";
+    for (int s = 0; s < SUBJECTS; s++)
+        cout << SUBJECT_NAME[s] << " average: " << subjectSum[s]/double(countStudents) << '\\\\n';
+}
+int main() {
+    addStudent(101, "Aarav", 78, 85, 72);
+    addStudent(102, "Isha", 92, 88, 95);
+    addStudent(103, "Rohan", 35, 48, 52);
+    addStudent(104, "Meera", 66, 59, 71);
+    addStudent(105, "Kabir", 45, 38, 60);
+    int choice;
+    do {
+        cout << "\\\\n===== Student Marks Analysis System =====\\\\n"
+             << "1. Add student\\\\n2. Search by roll number\\\\n3. Display all\\\\n4. Analyze marks\\\\n5. Exit\\\\nChoice: ";
+        if (!(cin >> choice)) break;
+        if (choice == 1) {
+            int r, a, b, c; string n;
+            cout << "Roll number: "; cin >> r;
+            cout << "Name (single word): "; cin >> n;
+            cout << "Maths, DS, DELD marks: "; cin >> a >> b >> c;
+            cout << (addStudent(r,n,a,b,c) ? "Student added.\\\\n" : "Invalid marks, duplicate roll, or array full.\\\\n");
+        } else if (choice == 2) searchStudent();
+        else if (choice == 3) displayAll();
+        else if (choice == 4) analyzeMarks();
+        else if (choice != 5) cout << "Invalid choice.\\\\n";
+    } while (choice != 5);
+    cout << "Thank you!\\\\n";
+    return 0;
+}`;
+$("cppSource").textContent=cpp;
+$("copy").onclick=async()=>{try{await navigator.clipboard.writeText(cpp);$("copy").textContent="Copied!";}catch(e){$("copy").textContent="Select the code below and copy";}};
+renderRecords();
+</script></main></body></html>
