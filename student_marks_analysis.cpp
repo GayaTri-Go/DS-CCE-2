@@ -1,165 +1,136 @@
-// Student Marks Analysis System
-// Data Structures Mini Project - Arrays and Linear Search
-// Amrutvahini College of Engineering, Sangamner | Dept. of IT | 2026-27
+// CGPA Analyser (console version)
+// Based on AVCOE Sangamner (Autonomous) Examination Rules and Regulations
+// Features: marks to grade, SGPA calculator, CGPA calculator with class and percentage
 
 #include <iostream>
 #include <iomanip>
+#include <cmath>
 #include <string>
 using namespace std;
 
-const int MAX_STUDENTS = 50;
-const int SUBJECTS = 3;
-const int PASS_MARKS = 40;
-const string SUBJECT_NAME[SUBJECTS] = {"Maths", "DS", "DELD"};
+const int MAX = 10;
 
-// Parallel arrays: index i holds the record of one student
-int    rollNo[MAX_STUDENTS];
-string name[MAX_STUDENTS];
-int    marks[MAX_STUDENTS][SUBJECTS];
-int    total[MAX_STUDENTS];
-int    count = 0;
+struct GradeRow { const char *letter; int point; int minMarks; const char *desc; };
+const GradeRow GRADES[] = {
+    {"O", 10, 90, "Outstanding"}, {"A+", 9, 80, "Excellent"}, {"A", 8, 70, "Very Good"},
+    {"B+", 7, 60, "Good"},       {"B", 6, 50, "Above Average"}, {"C", 5, 45, "Average"},
+    {"P", 4, 40, "Pass"}
+};
+const int GRADE_COUNT = 7;
 
-// Linear Search: check each element one by one, return index or -1
-int linearSearch(int key) {
-    for (int i = 0; i < count; i++) {
-        if (rollNo[i] == key)
-            return i;
-    }
+double round2(double x) { return floor(x * 100 + 0.5) / 100; }
+
+// Grade point from a letter grade, -1 if invalid
+int gradePoint(string g) {
+    for (char &c : g) c = toupper(c);
+    if (g == "F") return 0;
+    for (int i = 0; i < GRADE_COUNT; i++)
+        if (g == GRADES[i].letter) return GRADES[i].point;
     return -1;
 }
 
-bool isPass(int i) {
-    for (int s = 0; s < SUBJECTS; s++)
-        if (marks[i][s] < PASS_MARKS)
-            return false;
-    return true;
+// 1. Marks -> grade (3/4 credit course: CCE 40 + ESE 60)
+void marksToGrade() {
+    double ct1, ct2, c3, ese;
+    cout << "CCE-I class test (out of 32): ";  cin >> ct1;
+    cout << "CCE-II class test (out of 32): "; cin >> ct2;
+    cout << "CCE-III (out of 8): ";            cin >> c3;
+    cout << "ESE (out of 60): ";               cin >> ese;
+    double cce = ct1 / 2 + ct2 / 2 + c3;
+    double total = cce + ese;
+    cout << fixed << setprecision(2) << "\nCCE " << cce << "/40, ESE " << ese
+         << "/60, Total " << total << "/100\n";
+    if (ese < 24) { cout << "Grade F (Fail): ESE is below 40% (24/60)\n"; return; }
+    for (int i = 0; i < GRADE_COUNT; i++)
+        if (total >= GRADES[i].minMarks) {
+            cout << "Grade " << GRADES[i].letter << " (" << GRADES[i].desc << "), "
+                 << GRADES[i].point << " grade points\n";
+            return;
+        }
+    cout << "Grade F (Fail): total is below 40\n";
 }
 
-void addStudent(int r, const string &n, int m1, int m2, int m3) {
-    if (count == MAX_STUDENTS) {
-        cout << "Array is full. Cannot add more students.\n";
-        return;
+// 2. SGPA = sum(credit * grade point) / sum(credit)
+void sgpaCalc() {
+    int n;
+    cout << "Number of courses (max " << MAX * 2 << "): "; cin >> n;
+    if (n < 1 || n > MAX * 2) { cout << "Invalid number.\n"; return; }
+    double credits[MAX * 2], sumC = 0, sumP = 0;
+    for (int i = 0; i < n; i++) {
+        string g; int gp;
+        cout << "Course " << i + 1 << " credits: "; cin >> credits[i];
+        do { cout << "Course " << i + 1 << " grade (O, A+, A, B+, B, C, P, F): "; cin >> g; gp = gradePoint(g); }
+        while (gp < 0);
+        sumC += credits[i];
+        sumP += credits[i] * gp;
     }
-    if (linearSearch(r) != -1) {
-        cout << "Roll number " << r << " already exists.\n";
-        return;
-    }
-    rollNo[count] = r;
-    name[count] = n;
-    marks[count][0] = m1;
-    marks[count][1] = m2;
-    marks[count][2] = m3;
-    total[count] = m1 + m2 + m3;
-    count++;
+    cout << fixed << setprecision(2) << "\nTotal credits: " << sumC
+         << "\nSGPA: " << round2(sumP / sumC) << "\n";
 }
 
-void addStudentFromInput() {
-    int r, m[SUBJECTS];
-    string n;
-    cout << "Enter roll number: ";
-    cin >> r;
-    cout << "Enter name (single word): ";
-    cin >> n;
-    for (int s = 0; s < SUBJECTS; s++) {
-        do {
-            cout << "Enter marks in " << SUBJECT_NAME[s] << " (0-100): ";
-            cin >> m[s];
-        } while (m[s] < 0 || m[s] > 100);
-    }
-    int before = count;
-    addStudent(r, n, m[0], m[1], m[2]);
-    if (count > before)
-        cout << "Student added successfully.\n";
+// Class awarded from CGPA
+string classOf(double c) {
+    if (c >= 7.75) return "First Class with Distinction";
+    if (c >= 6.75) return "First Class";
+    if (c >= 6.25) return "Higher Second Class";
+    if (c >= 5.5)  return "Second Class";
+    return "Below 5.5 (class not listed in the rules)";
 }
 
-void searchStudent() {
-    int key;
-    cout << "Enter roll number to search: ";
-    cin >> key;
-    int i = linearSearch(key);
-    if (i == -1) {
-        cout << "Student not found.\n";
-        return;
-    }
-    cout << "\nRoll No : " << rollNo[i] << "\nName    : " << name[i] << "\n";
-    for (int s = 0; s < SUBJECTS; s++)
-        cout << left << setw(8) << SUBJECT_NAME[s] << ": " << marks[i][s] << "\n";
-    cout << "Total   : " << total[i] << "/" << SUBJECTS * 100
-         << "\nPercent : " << fixed << setprecision(2) << total[i] / (double)SUBJECTS << "%"
-         << "\nResult  : " << (isPass(i) ? "PASS" : "FAIL") << "\n";
+// Percentage from CGPA (SPPU slabs)
+double percentOf(double c) {
+    if (c >= 9.5)  return 20 * c - 100;
+    if (c >= 8.25) return 12 * c - 25;
+    if (c >= 6.75) return 10 * c - 7.5;
+    if (c >= 5.75) return 5 * c + 26.25;
+    if (c >= 4.75) return 10 * c - 2.5;
+    if (c >= 4.0)  return 6.6 * c + 13.6;
+    return -1;
 }
 
-void displayAll() {
-    if (count == 0) {
-        cout << "No records to display.\n";
-        return;
+// 3. CGPA = sum(credit * SGPA) / sum(credit)
+void cgpaCalc() {
+    int n;
+    cout << "Number of semesters (max 8): "; cin >> n;
+    if (n < 1 || n > 8) { cout << "Invalid number.\n"; return; }
+    double credit[8], sgpa[8], sumC = 0, sumP = 0;
+    for (int i = 0; i < n; i++) {
+        cout << "Semester " << i + 1 << " credits: "; cin >> credit[i];
+        cout << "Semester " << i + 1 << " SGPA: ";    cin >> sgpa[i];
+        sumC += credit[i];
+        sumP += credit[i] * sgpa[i];
     }
-    cout << "\n" << left << setw(6) << "Roll" << setw(12) << "Name";
-    for (int s = 0; s < SUBJECTS; s++)
-        cout << setw(7) << SUBJECT_NAME[s];
-    cout << setw(7) << "Total" << "Result\n";
-    cout << string(50, '-') << "\n";
-    for (int i = 0; i < count; i++) {
-        cout << left << setw(6) << rollNo[i] << setw(12) << name[i];
-        for (int s = 0; s < SUBJECTS; s++)
-            cout << setw(7) << marks[i][s];
-        cout << setw(7) << total[i] << (isPass(i) ? "PASS" : "FAIL") << "\n";
-    }
-}
+    double cgpa = round2(sumP / sumC);
+    double p = percentOf(cgpa);
+    cout << fixed << setprecision(2) << "\nTotal credits: " << sumC << "\nCGPA: " << cgpa
+         << "\nClass: " << classOf(cgpa) << "\n";
+    if (p >= 0) cout << "Percentage: " << p << "%\n";
+    else        cout << "Percentage: not defined below CGPA 4.00\n";
 
-void analyzeMarks() {
-    if (count == 0) {
-        cout << "No records to analyze.\n";
-        return;
-    }
-    int hi = 0, lo = 0, passed = 0, sum = 0;
-    for (int i = 0; i < count; i++) {
-        sum += total[i];
-        if (total[i] > total[hi]) hi = i;
-        if (total[i] < total[lo]) lo = i;
-        if (isPass(i)) passed++;
-    }
-    cout << "\n--- Class Analysis ---\n";
-    cout << "Total students : " << count << "\n";
-    cout << "Class average  : " << fixed << setprecision(2)
-         << sum / (double)(count * SUBJECTS) << " per subject\n";
-    cout << "Highest total  : " << total[hi] << " (" << name[hi] << ", Roll " << rollNo[hi] << ")\n";
-    cout << "Lowest total   : " << total[lo] << " (" << name[lo] << ", Roll " << rollNo[lo] << ")\n";
-    cout << "Passed         : " << passed << "\n";
-    cout << "Failed         : " << count - passed << "\n";
-    cout << "Pass percentage: " << passed * 100.0 / count << "%\n";
-    for (int s = 0; s < SUBJECTS; s++) {
-        int subSum = 0;
-        for (int i = 0; i < count; i++)
-            subSum += marks[i][s];
-        cout << SUBJECT_NAME[s] << " average" << string(8 - SUBJECT_NAME[s].size(), ' ')
-             << ": " << subSum / (double)count << "\n";
+    double target, nextC;
+    cout << "\nTarget CGPA (0 to skip): "; cin >> target;
+    if (target > 0) {
+        cout << "Next semester credits: "; cin >> nextC;
+        double need = (target * (sumC + nextC) - sumP) / nextC;
+        if (need > 10)      cout << "Not achievable: would need SGPA " << need << "\n";
+        else if (need <= 0) cout << "Target already secured.\n";
+        else                cout << "You need an SGPA of at least " << need << " next semester.\n";
     }
 }
 
 int main() {
-    // Sample data so the program can be demonstrated immediately
-    addStudent(101, "Aarav",  78, 85, 72);
-    addStudent(102, "Isha",   92, 88, 95);
-    addStudent(103, "Rohan",  35, 48, 52);
-    addStudent(104, "Meera",  66, 59, 71);
-    addStudent(105, "Kabir",  45, 38, 60);
-
     int choice;
     do {
-        cout << "\n===== Student Marks Analysis System =====\n"
-             << "1. Add student\n2. Search student by roll number\n"
-             << "3. Display all students\n4. Analyze class marks\n5. Exit\n"
-             << "Enter choice: ";
+        cout << "\n===== CGPA Analyser =====\n"
+             << "1. Marks to grade\n2. SGPA calculator\n3. CGPA calculator\n4. Exit\nEnter choice: ";
         cin >> choice;
         switch (choice) {
-            case 1: addStudentFromInput(); break;
-            case 2: searchStudent();       break;
-            case 3: displayAll();          break;
-            case 4: analyzeMarks();        break;
-            case 5: cout << "Thank you!\n"; break;
-            default: cout << "Invalid choice. Try again.\n";
+            case 1: marksToGrade(); break;
+            case 2: sgpaCalc();     break;
+            case 3: cgpaCalc();     break;
+            case 4: cout << "Thank you!\n"; break;
+            default: cout << "Invalid choice.\n";
         }
-    } while (choice != 5 && cin);
+    } while (choice != 4 && cin);
     return 0;
 }
