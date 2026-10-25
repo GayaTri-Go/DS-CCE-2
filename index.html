@@ -1,284 +1,118 @@
 <!DOCTYPE html>
-<!-- Student Marks Analysis System (web version)
-     Data Structures mini project, AVCOE Sangamner, IT 2026-27
-     Runs the same logic as student_marks_analysis.cpp: arrays + Linear Search.
-     Open this file in any browser, or host it with GitHub Pages. -->
 <html lang="en"><head><meta charset="utf-8">
-<meta name="description" content="Student Marks Analysis System: arrays and Linear Search, with the C++ source.">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Student Marks Analysis System</title>
+<title>AVCOE Marks &amp; CGPA Analyser</title>
 <style>
-:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f6f7fb;--card:#fff;--tx:#1b1f2a;--mu:#5d6577;--ac:#2f5bea;--bd:#d9ddea;--ok:#157f3b;--bad:#c62828;--hl:#fff3b0;color-scheme:light}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12141b;--card:#1b1e28;--tx:#eceef5;--mu:#9aa2b6;--ac:#7c9bff;--bd:#31364a;--ok:#5fd18a;--bad:#ff8a80;--hl:#5a4d00;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#12141b;--card:#1b1e28;--tx:#eceef5;--mu:#9aa2b6;--ac:#7c9bff;--bd:#31364a;--ok:#5fd18a;--bad:#ff8a80;--hl:#5a4d00;color-scheme:dark}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f6f7fb;--card:#fff;--tx:#1b1f2a;--mu:#5d6577;--ac:#2f5bea;--bd:#d9ddea;--ok:#157f3b;--bad:#c62828;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12141b;--card:#1b1e28;--tx:#eceef5;--mu:#9aa2b6;--ac:#7c9bff;--bd:#31364a;--ok:#5fd18a;--bad:#ff8a80;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#12141b;--card:#1b1e28;--tx:#eceef5;--mu:#9aa2b6;--ac:#7c9bff;--bd:#31364a;--ok:#5fd18a;--bad:#ff8a80;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-main{max-width:700px;margin:0 auto;padding:16px}
-h1{font-size:1.25rem;margin:4px 0 2px}.sub,.mu{color:var(--mu);font-size:.85rem}.sub{margin:0 0 12px}
-nav{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
-nav button,.btn{flex:1;padding:10px 6px;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;font:inherit;font-weight:600;cursor:pointer}
-nav button.on,.btn.p{background:var(--ac);color:#fff;border-color:var(--ac)}
+main{max-width:640px;margin:0 auto;padding:16px}
+h1{font-size:1.25rem;margin:4px 0 2px}
+.sub{color:var(--mu);font-size:.85rem;margin:0 0 12px}
+nav{display:flex;gap:6px;margin-bottom:12px}
+nav button{flex:1;padding:10px 4px;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;font:inherit;font-weight:600;cursor:pointer}
+nav button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
 .card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
-label{display:block;font-size:.8rem;color:var(--mu);margin-bottom:3px}
-input{width:100%;padding:9px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font:inherit}
-.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:10px}
-.sc{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:.9rem}
-th,td{text-align:left;padding:6px 6px;border-bottom:1px solid var(--bd);white-space:nowrap}
-tr.hit td{background:var(--hl)}tr.sk td{opacity:.55}
-.ok{color:var(--ok)}.bad{color:var(--bad)}.big{font-size:1.6rem;font-weight:700}
-pre{margin:0;padding:12px;background:var(--bg);border:1px solid var(--bd);border-radius:10px;overflow-x:auto;font:12.5px/1.5 ui-monospace,Menlo,Consolas,monospace;max-height:70vh}
-.hide{display:none}.row{display:flex;gap:8px;margin-top:8px}
+label{display:block;font-size:.82rem;color:var(--mu);margin-bottom:3px}
+input,select{width:100%;padding:9px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font:inherit}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row{display:grid;grid-template-columns:1.2fr 1fr 28px;gap:8px;margin-bottom:8px;align-items:end}
+.x{border:0;background:none;color:var(--bad);font-size:1.3rem;cursor:pointer;padding:0 0 6px}
+.add{border:1px dashed var(--ac);background:none;color:var(--ac);border-radius:8px;padding:8px;width:100%;font:inherit;cursor:pointer}
+.big{font-size:2rem;font-weight:700}
+.ok{color:var(--ok)}.bad{color:var(--bad)}
+.mu{color:var(--mu);font-size:.85rem}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{text-align:left;padding:6px 4px;border-bottom:1px solid var(--bd)}
+.sc{overflow-x:auto}
+.hide{display:none}
 </style></head><body><main>
-<h1>Student Marks Analysis System</h1>
-<p class="sub">Data Structures mini project · Arrays and Linear Search · AVCOE Sangamner, IT 2026-27</p>
-<nav><button class="on" data-t="a">Students</button><button data-t="b">Search</button><button data-t="c">Analysis</button><button data-t="d">C++ Code</button></nav>
+<h1>Marks &amp; CGPA Analyser</h1>
+<p class="sub">Based on AVCOE Sangamner Examination Rules and Regulations (Autonomous)</p>
+<nav><button class="on" data-t="m">Marks</button><button data-t="s">SGPA</button><button data-t="c">CGPA</button></nav>
 
-<section id="a">
-<div class="card"><b>Add student</b>
-<div class="g" style="margin-top:8px"><div><label>Roll no.</label><input id="r" type="number" min="1"></div>
-<div><label>Name</label><input id="n"></div>
-<div><label>Maths /100</label><input id="m0" type="number" min="0" max="100"></div>
-<div><label>DS /100</label><input id="m1" type="number" min="0" max="100"></div>
-<div><label>DELD /100</label><input id="m2" type="number" min="0" max="100"></div></div>
-<button class="btn p" id="add" style="width:100%">Add student</button><p id="msg" class="mu"></p></div>
-<div class="card sc"><table id="tb"></table></div>
+<section id="m">
+<div class="card"><div class="g">
+<div><label>CCE-I class test (out of 32)</label><input id="ct1" type="number" min="0" max="32" step="0.5"></div>
+<div><label>CCE-II class test (out of 32)</label><input id="ct2" type="number" min="0" max="32" step="0.5"></div>
+<div><label>CCE-III (out of 8)</label><input id="c3" type="number" min="0" max="8" step="0.5"></div>
+<div><label>ESE (out of 60)</label><input id="ese" type="number" min="0" max="60" step="0.5"></div>
+</div><p class="mu">CCE = CCE-I ÷ 2 + CCE-II ÷ 2 + CCE-III (out of 40). Applies to 3/4 credit theory courses with ESE of 60.</p></div>
+<div class="card" id="mo"></div>
+<div class="card"><b>ESE marks needed for each grade</b><div class="sc"><table id="need"></table></div>
+<p class="mu">Pass needs total ≥ 40 and ESE ≥ 24 (40% of 60).</p></div>
 </section>
 
-<section id="b" class="hide">
-<div class="card"><label>Roll number to search</label>
-<div class="row"><input id="k" type="number"><button class="btn p" id="go" style="flex:0 0 100px">Search</button></div>
-<p class="mu">Linear Search checks the array one index at a time until the roll number matches.</p></div>
+<section id="s" class="hide">
+<div class="card"><div id="cr"></div><button class="add" id="addc">+ Add course</button></div>
 <div class="card" id="so"></div>
-<div class="card sc"><table id="tr"></table></div>
+<p class="mu">SGPA = Σ(credits × grade point) ÷ Σ credits, rounded to two decimals.</p>
 </section>
 
-<section id="c" class="hide"><div class="card" id="an"></div></section>
-
-<section id="d" class="hide">
-<div class="card"><p class="mu" style="margin-top:0">This page runs the same logic as the C++ program below (arrays, Linear Search, same pass rule). Browsers cannot run C++ directly, so copy the code and compile it with g++.</p>
-<div class="row" style="margin:0 0 10px"><button class="btn p" id="cp">Copy C++ code</button><button class="btn" id="dl">Download .cpp</button></div>
-<pre><code id="src">// Student Marks Analysis System
-// Data Structures Mini Project - Arrays and Linear Search
-// Amrutvahini College of Engineering, Sangamner | Dept. of IT | 2026-27
-
-#include &lt;iostream&gt;
-#include &lt;iomanip&gt;
-#include &lt;string&gt;
-using namespace std;
-
-const int MAX_STUDENTS = 50;
-const int SUBJECTS = 3;
-const int PASS_MARKS = 40;
-const string SUBJECT_NAME[SUBJECTS] = {"Maths", "DS", "DELD"};
-
-// Parallel arrays: index i holds the record of one student
-int    rollNo[MAX_STUDENTS];
-string name[MAX_STUDENTS];
-int    marks[MAX_STUDENTS][SUBJECTS];
-int    total[MAX_STUDENTS];
-int    count = 0;
-
-// Linear Search: check each element one by one, return index or -1
-int linearSearch(int key) {
-    for (int i = 0; i &lt; count; i++) {
-        if (rollNo[i] == key)
-            return i;
-    }
-    return -1;
-}
-
-bool isPass(int i) {
-    for (int s = 0; s &lt; SUBJECTS; s++)
-        if (marks[i][s] &lt; PASS_MARKS)
-            return false;
-    return true;
-}
-
-void addStudent(int r, const string &amp;n, int m1, int m2, int m3) {
-    if (count == MAX_STUDENTS) {
-        cout &lt;&lt; "Array is full. Cannot add more students.\n";
-        return;
-    }
-    if (linearSearch(r) != -1) {
-        cout &lt;&lt; "Roll number " &lt;&lt; r &lt;&lt; " already exists.\n";
-        return;
-    }
-    rollNo[count] = r;
-    name[count] = n;
-    marks[count][0] = m1;
-    marks[count][1] = m2;
-    marks[count][2] = m3;
-    total[count] = m1 + m2 + m3;
-    count++;
-}
-
-void addStudentFromInput() {
-    int r, m[SUBJECTS];
-    string n;
-    cout &lt;&lt; "Enter roll number: ";
-    cin &gt;&gt; r;
-    cout &lt;&lt; "Enter name (single word): ";
-    cin &gt;&gt; n;
-    for (int s = 0; s &lt; SUBJECTS; s++) {
-        do {
-            cout &lt;&lt; "Enter marks in " &lt;&lt; SUBJECT_NAME[s] &lt;&lt; " (0-100): ";
-            cin &gt;&gt; m[s];
-        } while (m[s] &lt; 0 || m[s] &gt; 100);
-    }
-    int before = count;
-    addStudent(r, n, m[0], m[1], m[2]);
-    if (count &gt; before)
-        cout &lt;&lt; "Student added successfully.\n";
-}
-
-void searchStudent() {
-    int key;
-    cout &lt;&lt; "Enter roll number to search: ";
-    cin &gt;&gt; key;
-    int i = linearSearch(key);
-    if (i == -1) {
-        cout &lt;&lt; "Student not found.\n";
-        return;
-    }
-    cout &lt;&lt; "\nRoll No : " &lt;&lt; rollNo[i] &lt;&lt; "\nName    : " &lt;&lt; name[i] &lt;&lt; "\n";
-    for (int s = 0; s &lt; SUBJECTS; s++)
-        cout &lt;&lt; left &lt;&lt; setw(8) &lt;&lt; SUBJECT_NAME[s] &lt;&lt; ": " &lt;&lt; marks[i][s] &lt;&lt; "\n";
-    cout &lt;&lt; "Total   : " &lt;&lt; total[i] &lt;&lt; "/" &lt;&lt; SUBJECTS * 100
-         &lt;&lt; "\nPercent : " &lt;&lt; fixed &lt;&lt; setprecision(2) &lt;&lt; total[i] / (double)SUBJECTS &lt;&lt; "%"
-         &lt;&lt; "\nResult  : " &lt;&lt; (isPass(i) ? "PASS" : "FAIL") &lt;&lt; "\n";
-}
-
-void displayAll() {
-    if (count == 0) {
-        cout &lt;&lt; "No records to display.\n";
-        return;
-    }
-    cout &lt;&lt; "\n" &lt;&lt; left &lt;&lt; setw(6) &lt;&lt; "Roll" &lt;&lt; setw(12) &lt;&lt; "Name";
-    for (int s = 0; s &lt; SUBJECTS; s++)
-        cout &lt;&lt; setw(7) &lt;&lt; SUBJECT_NAME[s];
-    cout &lt;&lt; setw(7) &lt;&lt; "Total" &lt;&lt; "Result\n";
-    cout &lt;&lt; string(50, '-') &lt;&lt; "\n";
-    for (int i = 0; i &lt; count; i++) {
-        cout &lt;&lt; left &lt;&lt; setw(6) &lt;&lt; rollNo[i] &lt;&lt; setw(12) &lt;&lt; name[i];
-        for (int s = 0; s &lt; SUBJECTS; s++)
-            cout &lt;&lt; setw(7) &lt;&lt; marks[i][s];
-        cout &lt;&lt; setw(7) &lt;&lt; total[i] &lt;&lt; (isPass(i) ? "PASS" : "FAIL") &lt;&lt; "\n";
-    }
-}
-
-void analyzeMarks() {
-    if (count == 0) {
-        cout &lt;&lt; "No records to analyze.\n";
-        return;
-    }
-    int hi = 0, lo = 0, passed = 0, sum = 0;
-    for (int i = 0; i &lt; count; i++) {
-        sum += total[i];
-        if (total[i] &gt; total[hi]) hi = i;
-        if (total[i] &lt; total[lo]) lo = i;
-        if (isPass(i)) passed++;
-    }
-    cout &lt;&lt; "\n--- Class Analysis ---\n";
-    cout &lt;&lt; "Total students : " &lt;&lt; count &lt;&lt; "\n";
-    cout &lt;&lt; "Class average  : " &lt;&lt; fixed &lt;&lt; setprecision(2)
-         &lt;&lt; sum / (double)(count * SUBJECTS) &lt;&lt; " per subject\n";
-    cout &lt;&lt; "Highest total  : " &lt;&lt; total[hi] &lt;&lt; " (" &lt;&lt; name[hi] &lt;&lt; ", Roll " &lt;&lt; rollNo[hi] &lt;&lt; ")\n";
-    cout &lt;&lt; "Lowest total   : " &lt;&lt; total[lo] &lt;&lt; " (" &lt;&lt; name[lo] &lt;&lt; ", Roll " &lt;&lt; rollNo[lo] &lt;&lt; ")\n";
-    cout &lt;&lt; "Passed         : " &lt;&lt; passed &lt;&lt; "\n";
-    cout &lt;&lt; "Failed         : " &lt;&lt; count - passed &lt;&lt; "\n";
-    cout &lt;&lt; "Pass percentage: " &lt;&lt; passed * 100.0 / count &lt;&lt; "%\n";
-    for (int s = 0; s &lt; SUBJECTS; s++) {
-        int subSum = 0;
-        for (int i = 0; i &lt; count; i++)
-            subSum += marks[i][s];
-        cout &lt;&lt; SUBJECT_NAME[s] &lt;&lt; " average" &lt;&lt; string(8 - SUBJECT_NAME[s].size(), ' ')
-             &lt;&lt; ": " &lt;&lt; subSum / (double)count &lt;&lt; "\n";
-    }
-}
-
-int main() {
-    // Sample data so the program can be demonstrated immediately
-    addStudent(101, "Aarav",  78, 85, 72);
-    addStudent(102, "Isha",   92, 88, 95);
-    addStudent(103, "Rohan",  35, 48, 52);
-    addStudent(104, "Meera",  66, 59, 71);
-    addStudent(105, "Kabir",  45, 38, 60);
-
-    int choice;
-    do {
-        cout &lt;&lt; "\n===== Student Marks Analysis System =====\n"
-             &lt;&lt; "1. Add student\n2. Search student by roll number\n"
-             &lt;&lt; "3. Display all students\n4. Analyze class marks\n5. Exit\n"
-             &lt;&lt; "Enter choice: ";
-        cin &gt;&gt; choice;
-        switch (choice) {
-            case 1: addStudentFromInput(); break;
-            case 2: searchStudent();       break;
-            case 3: displayAll();          break;
-            case 4: analyzeMarks();        break;
-            case 5: cout &lt;&lt; "Thank you!\n"; break;
-            default: cout &lt;&lt; "Invalid choice. Try again.\n";
-        }
-    } while (choice != 5 &amp;&amp; cin);
-    return 0;
-}
-</code></pre></div>
+<section id="c" class="hide">
+<div class="card"><div id="sr"></div><button class="add" id="adds">+ Add semester</button></div>
+<div class="card" id="co"></div>
+<div class="card"><b>SGPA needed in next semester</b>
+<div class="g" style="margin-top:8px"><div><label>Target CGPA</label><input id="tg" type="number" step="0.01" min="0" max="10"></div>
+<div><label>Next semester credits</label><input id="nc" type="number" min="1"></div></div>
+<p id="ro" class="mu"></p></div>
 </section>
 </main>
 <script>
-const $=i=>document.getElementById(i),f2=x=>(Math.round(x*100)/100).toFixed(2);
-const SUB=["Maths","DS","DELD"],MAX=50;
-/* same parallel arrays as the C++ program */
-const rollNo=[],name=[],marks=[],total=[];let count=0;
-function linearSearch(key,trace){for(let i=0;i<count;i++){if(trace)trace.push(i);if(rollNo[i]===key)return i}return -1}
-const isPass=i=>marks[i].every(m=>m>=40);
-function addStudent(r,n,a,b,c){
- if(count===MAX)return"Array is full. Cannot add more students.";
- if(linearSearch(r)!==-1)return"Roll number "+r+" already exists.";
- rollNo[count]=r;name[count]=n;marks[count]=[a,b,c];total[count]=a+b+c;count++;return"";}
-[[101,"Aarav",78,85,72],[102,"Isha",92,88,95],[103,"Rohan",35,48,52],[104,"Meera",66,59,71],[105,"Kabir",45,38,60]].forEach(s=>addStudent(...s));
+const $=id=>document.getElementById(id),f2=x=>(Math.round(x*100)/100).toFixed(2);
+const G=[["O",10,90,"Outstanding"],["A+",9,80,"Excellent"],["A",8,70,"Very Good"],["B+",7,60,"Good"],["B",6,50,"Above Average"],["C",5,45,"Average"],["P",4,40,"Pass"]];
+const GP={O:10,"A+":9,A:8,"B+":7,B:6,C:5,P:4,F:0};
+function grade(t){for(const g of G)if(t>=g[2])return g;return["F",0,0,"Fail"]}
+function pct(c){if(c>=9.5)return 20*c-100;if(c>=8.25)return 12*c-25;if(c>=6.75)return 10*c-7.5;if(c>=5.75)return 5*c+26.25;if(c>=4.75)return 10*c-2.5;if(c>=4)return 6.6*c+13.6;return null}
+function cls(c){return c>=7.75?"First Class with Distinction":c>=6.75?"First Class":c>=6.25?"Higher Second Class":c>=5.5?"Second Class":"Below 5.5 (class not listed in the rules)"}
+const v=id=>parseFloat($(id).value);
 
-function show(){
- let h="<tr><th>Roll</th><th>Name</th>"+SUB.map(s=>"<th>"+s+"</th>").join("")+"<th>Total</th><th>Result</th></tr>";
- for(let i=0;i<count;i++)h+=`<tr><td>${rollNo[i]}</td><td>${esc(name[i])}</td>${marks[i].map(m=>"<td>"+m+"</td>").join("")}<td>${total[i]}</td><td class="${isPass(i)?"ok":"bad"}"><b>${isPass(i)?"PASS":"FAIL"}</b></td></tr>`;
- $("tb").innerHTML=h;analysis();}
-const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+/* Marks */
+function marks(){
+ const a=v("ct1"),b=v("ct2"),c=v("c3"),e=v("ese");
+ const cce=(a||0)/2+(b||0)/2+(c||0);
+ if([a,b,c,e].some(isNaN)){$("mo").innerHTML='<span class="mu">Enter all four marks to see the result.</span>';}
+ else{const t=cce+e,g=grade(t),pass=t>=40&&e>=24,fin=pass?g:["F",0,0,"Fail"];
+  $("mo").innerHTML=`<div class="mu">CCE ${f2(cce)}/40 · ESE ${e}/60</div><div class="big">${f2(t)}/100</div>
+  <div class="${pass?"ok":"bad"}"><b>Grade ${fin[0]} (${fin[3]}), ${fin[1]} grade points</b></div>
+  ${!pass&&t>=40?'<div class="bad mu">Failed: ESE is below the 40% minimum (24/60).</div>':""}`}
+ let h="<tr><th>Grade</th><th>Total</th><th>ESE needed</th></tr>";
+ for(const g of G){const n=Math.max(24,g[2]-cce),ok=n<=60;
+  h+=`<tr><td>${g[0]}</td><td>≥ ${g[2]}</td><td class="${ok?"":"bad"}">${ok?Math.ceil(n*2)/2:"not possible"}</td></tr>`}
+ $("need").innerHTML=h}
+["ct1","ct2","c3","ese"].forEach(i=>$(i).oninput=marks);marks();
 
-$("add").onclick=()=>{
- const r=parseInt($("r").value),n=$("n").value.trim(),m=[0,1,2].map(i=>parseInt($("m"+i).value));
- if(isNaN(r)||!n||m.some(x=>isNaN(x)||x<0||x>100)){$("msg").className="mu bad";$("msg").textContent="Enter roll no., name and marks between 0 and 100.";return}
- const e=addStudent(r,n,...m);$("msg").className="mu "+(e?"bad":"ok");$("msg").textContent=e||"Student added successfully.";
- if(!e)["r","n","m0","m1","m2"].forEach(i=>$(i).value="");show();};
+/* SGPA */
+function opts(){return Object.keys(GP).map(k=>`<option>${k}</option>`).join("")}
+function addCourse(cr,gr){const d=document.createElement("div");d.className="row";
+ d.innerHTML=`<div><label>Credits</label><input type="number" min="0" step="0.5" value="${cr||""}"></div><div><label>Grade</label><select>${opts()}</select></div><button class="x" title="Remove">×</button>`;
+ if(gr)d.querySelector("select").value=gr;
+ d.oninput=sgpa;d.querySelector(".x").onclick=()=>{d.remove();sgpa()};$("cr").appendChild(d);sgpa()}
+function sgpa(){let c=0,p=0;document.querySelectorAll("#cr .row").forEach(r=>{const cr=parseFloat(r.querySelector("input").value);
+ if(cr>0){c+=cr;p+=cr*GP[r.querySelector("select").value]}});
+ $("so").innerHTML=c?`<div class="mu">${c} credits registered</div><div class="big">SGPA ${f2(p/c)}</div>`:'<span class="mu">Add credits and grades to see your SGPA.</span>'}
+$("addc").onclick=()=>addCourse();[[4,"A"],[3,"B+"],[3,"A+"]].forEach(x=>addCourse(...x));
 
-$("go").onclick=()=>{
- const key=parseInt($("k").value);if(isNaN(key))return;
- const t=[],i=linearSearch(key,t);
- $("so").innerHTML=i<0?'<b class="bad">Student not found.</b><div class="mu">'+t.length+" comparisons made (whole array checked).</div>"
-  :`<div class="mu">Found at index ${i} after ${t.length} comparison${t.length>1?"s":""}</div><div class="big">${esc(name[i])} · Roll ${rollNo[i]}</div>
-  <div>${SUB.map((s,j)=>s+": <b>"+marks[i][j]+"</b>").join(" · ")}</div>
-  <div>Total <b>${total[i]}/300</b> · ${f2(total[i]/3)}% · <b class="${isPass(i)?"ok":"bad"}">${isPass(i)?"PASS":"FAIL"}</b></div>`;
- let h="<tr><th>Index</th><th>Roll no.</th><th>Compare with "+key+"</th></tr>";
- for(let j=0;j<count;j++){const ch=t.includes(j);h+=`<tr class="${j===i?"hit":ch?"":"sk"}"><td>${j}</td><td>${rollNo[j]}</td><td>${j===i?"match, stop":ch?"no match":"not reached"}</td></tr>`}
- $("tr").innerHTML=h;};
-$("k").onkeydown=e=>{if(e.key==="Enter")$("go").click()};
+/* CGPA */
+function addSem(cr,sg){const d=document.createElement("div");d.className="row";
+ d.innerHTML=`<div><label>Credits</label><input type="number" min="0" value="${cr||""}"></div><div><label>SGPA</label><input type="number" min="0" max="10" step="0.01" value="${sg||""}"></div><button class="x" title="Remove">×</button>`;
+ d.oninput=cgpa;d.querySelector(".x").onclick=()=>{d.remove();cgpa()};$("sr").appendChild(d);cgpa()}
+function cgpa(){let c=0,s=0;document.querySelectorAll("#sr .row").forEach(r=>{const i=r.querySelectorAll("input"),a=parseFloat(i[0].value),b=parseFloat(i[1].value);
+ if(a>0&&!isNaN(b)){c+=a;s+=a*b}});
+ if(!c){$("co").innerHTML='<span class="mu">Add semester credits and SGPA to see your CGPA.</span>';$("ro").textContent="";return}
+ const g=Math.round(s/c*100)/100,p=pct(g);
+ $("co").innerHTML=`<div class="mu">${c} credits across semesters</div><div class="big">CGPA ${f2(g)}</div>
+  <div><b>${cls(g)}</b></div><div class="mu">Percentage: ${p===null?"not defined below CGPA 4.00":f2(p)+"%"}</div>`;
+ const t=v("tg"),n=v("nc");
+ $("ro").textContent=(t>=0&&n>0)?(()=>{const r=(t*(c+n)-s)/n;return r>10?`Not achievable: it would need an SGPA of ${f2(r)}.`:r<=0?"Your target is already secured.":`You need an SGPA of at least ${f2(r)} in the next semester.`})():"Enter a target CGPA and next semester credits."}
+$("adds").onclick=()=>addSem();["tg","nc"].forEach(i=>$(i).oninput=cgpa);
+[[20,8.45],[22,7.8]].forEach(x=>addSem(...x));
 
-function analysis(){
- if(!count){$("an").innerHTML='<span class="mu">No records to analyze.</span>';return}
- let hi=0,lo=0,pass=0,sum=0;
- for(let i=0;i<count;i++){sum+=total[i];if(total[i]>total[hi])hi=i;if(total[i]<total[lo])lo=i;if(isPass(i))pass++}
- const av=SUB.map((s,j)=>f2(marks.reduce((a,m)=>a+m[j],0)/count));
- $("an").innerHTML=`<div class="mu">${count} students</div><div class="big">Average ${f2(sum/(count*3))} per subject</div>
- <table><tr><td>Highest total</td><td><b>${total[hi]}</b> (${esc(name[hi])}, Roll ${rollNo[hi]})</td></tr>
- <tr><td>Lowest total</td><td><b>${total[lo]}</b> (${esc(name[lo])}, Roll ${rollNo[lo]})</td></tr>
- <tr><td>Passed / Failed</td><td><b class="ok">${pass}</b> / <b class="bad">${count-pass}</b></td></tr>
- <tr><td>Pass percentage</td><td><b>${f2(pass*100/count)}%</b></td></tr>
- ${SUB.map((s,j)=>`<tr><td>${s} average</td><td>${av[j]}</td></tr>`).join("")}</table>
- <p class="mu">Pass rule: 40 or more in every subject.</p>`;}
-
-$("cp").onclick=async()=>{try{await navigator.clipboard.writeText($("src").textContent);$("cp").textContent="Copied!"}catch(e){const r=document.createRange();r.selectNodeContents($("src"));const s=getSelection();s.removeAllRanges();s.addRange(r);$("cp").textContent="Selected, press copy"}setTimeout(()=>$("cp").textContent="Copy C++ code",1800)};
-$("dl").onclick=()=>{try{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([$("src").textContent],{type:"text/plain"}));a.download="student_marks_analysis.cpp";a.click()}catch(e){$("dl").textContent="Use Copy instead"}};
+/* Tabs */
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
  document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x===b));
- ["a","b","c","d"].forEach(i=>$(i).classList.toggle("hide",i!==b.dataset.t))});
-show();
+ ["m","s","c"].forEach(i=>$(i).classList.toggle("hide",i!==b.dataset.t))});
 </script></body></html>
